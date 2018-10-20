@@ -10,8 +10,6 @@ class Cell:
 		self.id = ident
 		self.timestamp = timestamp
 		self.state = state
-		self.previous_timestamp = timestamp
-		self.previous_state = state
 
 	
 	def find_id(self):
@@ -20,8 +18,6 @@ class Cell:
 
 
 	def change_state(self, timestamp, state):
-		self.previous_state = self.state
-		self.previous_timestamp = self.timestamp
 		self.timestamp = timestamp
 		self.state = state
 
@@ -30,8 +26,8 @@ class Cell:
 class CA_space:
 
 	def __init__(self, firstD, secondD, cells):
-		time = datetime.datetime.now()
-		self.space = [[Cell(str(i)+ ':' + str(j), time, 0) for i in range(secondD)] for j in range(firstD)]
+		self.init_time = datetime.datetime.now()
+		self.space = [[Cell(str(i)+ ':' + str(j), self.init_time, 0) for i in range(secondD)] for j in range(firstD)]
 		self.generate_grains(cells)
 		self.grains = cells
 
@@ -47,7 +43,7 @@ class CA_space:
 				sample_row = sample_row[0]
 				sample_cell = random.sample(sample_row, 1)
 				sample_cell = sample_cell[0]
-			sample_cell.state = cell_num
+			sample_cell.change_state(self.init_time ,cell_num)
 
 
 	def find_neigh(self, cell):
@@ -55,7 +51,7 @@ class CA_space:
 		neighbours = []
 		for row in self.space:
 			for c in  row:
-				i , j = cell.find_id()
+				i , j = c.find_id()
 				if math.fabs(x - i) <= 1 and math.fabs(y -j) <= 1:
 					neighbours.append(c)
 		return neighbours
@@ -72,9 +68,10 @@ class CA_space:
 					grains = [0 for i in range(self.grains)]
 					for i in range(1,self.grains+1):
 						for neighbour in neighbours:
-							if neighbour.previous_state == i:
-
+							if neighbour.state == i and neighbour.timestamp < time:
 								grains[i] = grains[i] + 1
+					if grains == [0 for i in range(self.grains)]:
+						continue
 					new_grain = 0
 					for i in range(self.grains):
 						if grains[i] >= new_grain:
@@ -85,5 +82,10 @@ class CA_space:
 
 
 
-CA = CA_space(20,20,50)
+CA = CA_space(50,50,50)
 CA.build_grains()
+for row in CA.space:
+	for cell in row:
+		print("id: ",cell.id,"state: ",cell.state)
+		print("id: ", cell.id,"timestamp: ", cell.timestamp)
+		print("==============================================")
