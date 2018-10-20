@@ -79,11 +79,14 @@ class CA_space:
 					cell.change_state(time, new_grain)
 
 
+	def fill_space(self):
+		for i in range(math.ceil(math.sqrt(len(self.space))*1.25)):
+			print(i)
+			CA.build_grains()
 
 
-
-CA = CA_space(50,50,50)
-CA.build_grains()
+CA = CA_space(60,60,200)
+CA.fill_space()
 for row in CA.space:
 	for cell in row:
 		print("id: ",cell.id,"state: ",cell.state)
