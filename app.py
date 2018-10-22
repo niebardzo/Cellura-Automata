@@ -4,6 +4,8 @@ import datetime
 import random
 import math
 import numpy as np
+from prettytable import PrettyTable
+
 
 class Cell:
 
@@ -79,15 +81,21 @@ class CA_space:
 
 
 	def fill_space(self):
-		while self.empty_cells > 0:
+		while self.empty_cells >= 0:
 			self.build_grains()
+
+	def pretty_display(self):
+		pretty_space = PrettyTable()
+		pretty_space.field_names = range(self.space.shape[0])
+		for row in self.space:
+			pretty_row = []
+			for cell in row:
+				pretty_row.append(cell.state)
+			pretty_space.add_row(pretty_row)
+		print(pretty_space)
 
 
 
 CA = CA_space(20,20,30)
 CA.fill_space()
-for row in CA.space:
-	for cell in row:
-		print("id: ",cell.id,"state: ",cell.state)
-		print("id: ", cell.id,"timestamp: ", cell.timestamp)
-		print("==============================================")
+CA.pretty_display()
