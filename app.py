@@ -3,6 +3,7 @@
 import datetime
 import random
 import math
+import numpy as np
 
 class Cell:
 
@@ -27,7 +28,7 @@ class CA_space:
 
 	def __init__(self, firstD, secondD, cells):
 		self.init_time = datetime.datetime.now()
-		self.space = [[Cell(str(i)+ ':' + str(j), self.init_time, 0) for i in range(secondD)] for j in range(firstD)]
+		self.space = np.array([[Cell(str(i)+ ':' + str(j), self.init_time, 0) for i in range(secondD)] for j in range(firstD)])
 		self.generate_grains(cells)
 		self.grains = cells
 		self.empty_cells = (firstD * secondD) - self.grains
@@ -35,14 +36,12 @@ class CA_space:
 
 	def generate_grains(self, cells):
 		for cell_num in range(cells):
-			sample_row = random.sample(self.space, 1)
-			sample_row = sample_row[0]
-			sample_cell = random.sample(sample_row, 1)
+			random_row = random.randrange(0,self.space.shape[0],1)
+			sample_cell = np.random.choice(self.space[random_row],1)
 			sample_cell = sample_cell[0]
 			while sample_cell.state != 0:
-				sample_row = random.sample(self.space, 1)
-				sample_row = sample_row[0]
-				sample_cell = random.sample(sample_row, 1)
+				random_row = random.randrange(0,self.space.shape[0],1)
+				sample_cell = np.random.choice(self.space[random_row],1)
 				sample_cell = sample_cell[0]
 			sample_cell.change_state(self.init_time ,cell_num)
 
@@ -50,35 +49,33 @@ class CA_space:
 	def find_neigh(self, cell):
 		x , y = cell.find_id()
 		neighbours = []
-		for row in self.space:
-			for c in  row:
-				i , j = c.find_id()
-				if math.fabs(x - i) <= 1 and math.fabs(y -j) <= 1:
-					neighbours.append(c)
+		for c in self.space.flat:
+			i , j = c.find_id()
+			if math.fabs(x - i) <= 1 and math.fabs(y -j) <= 1:
+				neighbours.append(c)
 		return neighbours
 
 
 	def build_grains(self):
 		time = datetime.datetime.now()
-		for row in self.space:
-			for cell in row:
-				if cell.state != 0 :
+		for cell in self.space.flat:
+			if cell.state != 0 :
+				continue
+			else:
+				neighbours = self.find_neigh(cell)
+				grains = [0 for i in range(self.grains)]
+				for i in range(1,self.grains+1):
+					for neighbour in neighbours:
+						if neighbour.state == i and neighbour.timestamp < time:
+							grains[i] = grains[i] + 1
+				if grains == [0 for i in range(self.grains)]:
 					continue
-				else:
-					neighbours = self.find_neigh(cell)
-					grains = [0 for i in range(self.grains)]
-					for i in range(1,self.grains+1):
-						for neighbour in neighbours:
-							if neighbour.state == i and neighbour.timestamp < time:
-								grains[i] = grains[i] + 1
-					if grains == [0 for i in range(self.grains)]:
-						continue
-					new_grain = 0
-					for i in range(self.grains):
-						if grains[i] >= new_grain:
-							new_grain = i
-					cell.change_state(time, new_grain)
-					self.empty_cells = self.empty_cells - 1
+				new_grain = 0
+				for i in range(self.grains):
+					if grains[i] >= new_grain:
+						new_grain = i
+				cell.change_state(time, new_grain)
+				self.empty_cells = self.empty_cells - 1
 
 
 	def fill_space(self):
@@ -87,7 +84,7 @@ class CA_space:
 
 
 
-CA = CA_space(50,50,30)
+CA = CA_space(20,20,30)
 CA.fill_space()
 for row in CA.space:
 	for cell in row:
