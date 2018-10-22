@@ -30,6 +30,7 @@ class CA_space:
 		self.space = [[Cell(str(i)+ ':' + str(j), self.init_time, 0) for i in range(secondD)] for j in range(firstD)]
 		self.generate_grains(cells)
 		self.grains = cells
+		self.empty_cells = (firstD * secondD) - self.grains
 
 
 	def generate_grains(self, cells):
@@ -77,15 +78,16 @@ class CA_space:
 						if grains[i] >= new_grain:
 							new_grain = i
 					cell.change_state(time, new_grain)
+					self.empty_cells = self.empty_cells - 1
 
 
 	def fill_space(self):
-		for i in range(math.ceil(math.sqrt(len(self.space))*1.25)):
-			print(i)
-			CA.build_grains()
+		while self.empty_cells > 0:
+			self.build_grains()
 
 
-CA = CA_space(60,60,200)
+
+CA = CA_space(50,50,30)
 CA.fill_space()
 for row in CA.space:
 	for cell in row:
