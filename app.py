@@ -10,17 +10,20 @@ from prettytable import PrettyTable
 class Cell:
 
 	def __init__(self, ident, timestamp, state):
+		"""Constructor for CELL"""
 		self.id = ident
 		self.timestamp = timestamp
 		self.state = state
 
 	
 	def find_id(self):
+		"""Method for retriving coordinates in the space for the cell."""
 		x , y = self.id.split(':')
 		return int(x), int(y)
 
 
 	def change_state(self, timestamp, state):
+		"""Method for changing the state in the cell."""
 		self.timestamp = timestamp
 		self.state = state
 
@@ -29,6 +32,7 @@ class Cell:
 class CA_space:
 
 	def __init__(self, firstD, secondD, cells):
+		"""Constructor for CA space. As input you need to give First D size, Second D size and the number of seed grains."""
 		self.init_time = datetime.datetime.now()
 		self.space = np.array([[Cell(str(i)+ ':' + str(j), self.init_time, 0) for i in range(secondD)] for j in range(firstD)])
 		self.generate_grains(cells)
@@ -37,6 +41,7 @@ class CA_space:
 
 
 	def generate_grains(self, cells):
+		"""Initial method for random placing seed in CA space"""
 		for cell_num in range(cells):
 			random_row = random.randrange(0,self.space.shape[0],1)
 			sample_cell = np.random.choice(self.space[random_row],1)
@@ -48,14 +53,19 @@ class CA_space:
 			sample_cell.change_state(self.init_time ,cell_num)
 
 
+
 	def find_neigh(self, cell):
+		"""Method for finding neighbours for inputed cell. Using Moore algorythm and with absorbing boudary condition."""
 		x , y = cell.find_id()
 		neighbours = []
 		for c in self.space.flat:
 			i , j = c.find_id()
 			if math.fabs(x - i) <= 1 and math.fabs(y -j) <= 1:
 				neighbours.append(c)
+			if len(neighbours) == 9:
+				return neighbours
 		return neighbours
+
 
 
 	def build_grains(self):
@@ -81,10 +91,14 @@ class CA_space:
 
 
 	def fill_space(self):
+		"""Will be filling space until all element are not empty."""
 		while self.empty_cells >= 0:
 			self.build_grains()
+			self.pretty_display()
+			
 
 	def pretty_display(self):
+		"""Display the space with PrettyTables."""
 		pretty_space = PrettyTable()
 		pretty_space.field_names = range(self.space.shape[0])
 		for row in self.space:
@@ -96,6 +110,5 @@ class CA_space:
 
 
 
-CA = CA_space(20,20,30)
+CA = CA_space(40,40,40)
 CA.fill_space()
-CA.pretty_display()
