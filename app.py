@@ -34,9 +34,9 @@ class CA_space:
 	def __init__(self, firstD, secondD, cells):
 		"""Constructor for CA space. As input you need to give First D size, Second D size and the number of seed grains."""
 		self.init_time = datetime.datetime.now()
-		self.space = np.array([[Cell(str(i)+ ':' + str(j), self.init_time, 0) for i in range(secondD)] for j in range(firstD)])
-		self.generate_grains(cells)
-		self.grains = cells
+		self.space = np.array([[Cell(str(i)+ ':' + str(j), self.init_time, 0) for i in range(secondD)] for j in range(firstD)])		
+		self.grains = cells + 1
+		self.generate_grains(self.grains)
 		self.empty_cells = (firstD * secondD) - self.grains
 
 
@@ -61,19 +61,28 @@ class CA_space:
 		width = self.space.shape[0]
 		if (length == 0 or width == 0 or x < 0 or x >= length or y < 0 or y >= width):
 			return []
-		neighs = [(i,j) for i in range(y-1,y+2) if 0<=i<length for j in range(x-1,x+2) if 0<=j<width]
+		neighs = [(i,j) for i in range(y-1,y+2) if 0<=i<width for j in range(x-1,x+2) if 0<=j<length]
 		neighbours = []
 		for neigh in neighs:
 			neighbours.append(self.space[neigh[0],neigh[1]])
 		return neighbours
-		
 
+
+	def check_empty_neighbours(self, cell):
+		neighbours = self.get_neighbours(cell)
+		flag = True
+		for neighbour in neighbours:
+			if neighbour.state != 0:
+				flag = False
+		return flag
 
 
 	def build_grains(self):
 		time = datetime.datetime.now()
 		for cell in self.space.flat:
 			if cell.state != 0 :
+				continue
+			elif self.check_empty_neighbours(cell):
 				continue
 			else:
 				neighbours = self.get_neighbours(cell)
@@ -115,6 +124,5 @@ class CA_space:
 		print(pretty_space)
 
 
-
-CA = CA_space(30,30,50)
+CA = CA_space(30,30,30)
 CA.fill_space()
