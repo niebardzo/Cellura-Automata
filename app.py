@@ -5,7 +5,7 @@ import random
 import math
 import numpy as np
 from prettytable import PrettyTable
-
+from PIL import Image
 
 class Cell:
 
