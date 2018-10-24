@@ -54,17 +54,19 @@ class CA_space:
 
 
 
-	def find_neigh(self, cell):
+	def get_neighbours(self, cell):
 		"""Method for finding neighbours for inputed cell. Using Moore algorythm and with absorbing boudary condition."""
-		x , y = cell.find_id()
+		x,y = cell.find_id()
+		length = self.space.shape[1]
+		width = self.space.shape[0]
+		if (length == 0 or width == 0 or x < 0 or x >= length or y < 0 or y >= width):
+			return []
+		neighs = [(i,j) for i in range(y-1,y+2) if 0<=i<length for j in range(x-1,x+2) if 0<=j<width]
 		neighbours = []
-		for c in self.space.flat:
-			i , j = c.find_id()
-			if math.fabs(x - i) <= 1 and math.fabs(y -j) <= 1:
-				neighbours.append(c)
-			if len(neighbours) == 9:
-				return neighbours
+		for neigh in neighs:
+			neighbours.append(self.space[neigh[0],neigh[1]])
 		return neighbours
+		
 
 
 
@@ -74,7 +76,7 @@ class CA_space:
 			if cell.state != 0 :
 				continue
 			else:
-				neighbours = self.find_neigh(cell)
+				neighbours = self.get_neighbours(cell)
 				grains = [0 for i in range(self.grains)]
 				for i in range(1,self.grains+1):
 					for neighbour in neighbours:
@@ -100,15 +102,19 @@ class CA_space:
 	def pretty_display(self):
 		"""Display the space with PrettyTables."""
 		pretty_space = PrettyTable()
-		pretty_space.field_names = range(self.space.shape[0])
-		for row in self.space:
-			pretty_row = []
-			for cell in row:
-				pretty_row.append(cell.state)
-			pretty_space.add_row(pretty_row)
+		pretty_space.field_names = range(self.space.shape[1])
+		count = 0
+		pretty_row = []
+		for cell in self.space.flat:
+			count = count + 1
+			pretty_row.append(cell.state)
+			if count >= self.space.shape[1]:
+				pretty_space.add_row(pretty_row)
+				count = 0
+				pretty_row = []
 		print(pretty_space)
 
 
 
-CA = CA_space(40,40,40)
+CA = CA_space(30,30,50)
 CA.fill_space()
