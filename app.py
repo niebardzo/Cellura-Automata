@@ -73,6 +73,7 @@ class CA_space:
 
 
 	def check_empty_neighbours(self, cell):
+		"""To check if cell has only neighbours with the state 0."""
 		neighbours = self.get_neighbours(cell)
 		flag = True
 		for neighbour in neighbours:
@@ -82,6 +83,7 @@ class CA_space:
 
 
 	def build_grains(self):
+		"""Basic function to grow the grains."""
 		time = datetime.datetime.now()
 		for cell in self.space.flat:
 			if cell.state != 0 :
@@ -114,6 +116,7 @@ class CA_space:
 			counter = counter + 1
 			#self.pretty_display()
 		self.export_image(name)
+		self.export_txt(name)
 		self.export_gif(name,counter)
 
 			
@@ -172,7 +175,7 @@ class CA_space:
 
 
 	def pretty_display(self):
-		"""Display the space with PrettyTables."""
+		"""Display the space with PrettyTables. Used for testing purpose before export was avaiable."""
 		pretty_space = PrettyTable()
 		pretty_space.field_names = range(self.space.shape[1])
 		count = 0
@@ -190,4 +193,3 @@ class CA_space:
 #CA = CA_space(300,200,50)
 #CA.import_txt("import.txt")
 #CA.fill_space("export")
-#CA.export_txt("export")
