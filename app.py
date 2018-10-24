@@ -8,6 +8,7 @@ from prettytable import PrettyTable
 from PIL import Image
 import imageio
 from colour import Color
+import os
 
 
 class Cell:
@@ -104,22 +105,27 @@ class CA_space:
 				self.empty_cells = self.empty_cells - 1
 
 
-	def fill_space(self):
+	def fill_space(self, name):
 		"""Will be filling space until all element are not empty."""
+		counter = 0
 		while self.empty_cells >= 0:
 			self.build_grains()
+			self.export_image(str(name)+str(counter))
+			counter = counter + 1
 			#self.pretty_display()
+		self.export_image(name)
+		self.export_gif(name,counter)
 
 			
-	def export_txt(self):
-		with open('export.txt','w') as file:
-			file.write(str(self.space.shape[0])+ ' ' + str(self.space.shape[1])+' '+str(self.grains - 1) + '\n')
+	def export_txt(self, name):
+		with open(str(name)+'.txt','w') as file:
+			file.write(str(self.space.shape[1])+ ' ' + str(self.space.shape[0])+' '+str(self.grains - 1) + '\n')
 			for cell in self.space.flat:
 				x, y = cell.find_id()
 				file.write(str(x)+' '+str(y)+' '+str(cell.state)+' '+str(cell.id)+'\n')				
 
 
-	def export_image(self):
+	def export_image(self, name):
 		"""One cell for 9 pixels. Colors of grains from red to blue."""
 		red = Color("red")
 		blue = Color("blue")
@@ -129,28 +135,40 @@ class CA_space:
 			part = part * 255
 			rgb_white.append(part)
 		colours = list(red.range_to(blue, int(self.grains)))
-		image = np.zeros([self.space.shape[0],self.space.shape[1], 3], dtype=np.uint(8))
+		image = np.zeros([self.space.shape[1],self.space.shape[0], 3], dtype=np.uint(8))
 		for grain in range(self.grains+1):
+			rgb = []
+			for part in colours[grain-1].rgb:
+				part = part * 255
+				rgb.append(part)
 			for cell in self.space.flat:
-				x,y = cell.find_id()
 				if cell.state == grain:
-					rgb = []
-					for part in colours[grain].rgb:
-						part = part * 255
-						rgb.append(part)
+					x,y = cell.find_id()
 					image[x,y] = rgb
 		img = Image.fromarray(image.astype('uint8'))
-		img.save("export.png")
+		img.save(str(name)+'.png')
 
 
-	def export_gif(self):
-		pass
+	def export_gif(self,name,counter):
+		images = []
+		for i in range(1,counter):
+			images.append(imageio.imread(str(name)+str(i)+'.png'))
+		if images == []:
+			return 0
+		imageio.mimsave(str(name)+'.gif', images)
+		for i in range(counter):
+			os.remove(str(name)+str(i)+'.png')
 
-	def import_image(self):
-		pass
 
-	def import_txt(self):
-		pass
+	def import_txt(self, path):
+		with open(str(path), 'r') as file:
+			lines = file.readlines()
+			init = lines[0].split(' ')
+			self.__init__(int(init[1]),int(init[0]),int(init[2]))
+			self.empty_cells = -1
+			for line in lines[1:]:
+				line = line.split(' ')
+				self.space[int(line[1]),int(line[0])].state = int(line[2])
 
 
 	def pretty_display(self):
@@ -169,7 +187,7 @@ class CA_space:
 		print(pretty_space)
 
 
-CA = CA_space(30,30,5)
-CA.fill_space()
-CA.export_txt()
-CA.export_image()
+CA = CA_space(300,200,50)
+CA.import_txt("import.txt")
+CA.fill_space("export")
+CA.export_txt("export")
