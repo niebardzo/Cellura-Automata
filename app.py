@@ -9,6 +9,7 @@ from PIL import Image
 import imageio
 from colour import Color
 
+
 class Cell:
 
 	def __init__(self, ident, timestamp, state):
