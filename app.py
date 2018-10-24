@@ -188,6 +188,6 @@ class CA_space:
 
 
 CA = CA_space(300,200,50)
-CA.import_txt("import.txt")
+#CA.import_txt("import.txt")
 CA.fill_space("export")
 CA.export_txt("export")

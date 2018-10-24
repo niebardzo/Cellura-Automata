@@ -9,6 +9,9 @@ ptable = "*"
 pillow = "*"
 imageio = "*"
 colour = "*"
+flask = "*"
+flask-expects-json = "*"
+requests = "*"
 
 [dev-packages]
 
