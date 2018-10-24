@@ -12,6 +12,7 @@ colour = "*"
 flask = "*"
 flask-expects-json = "*"
 requests = "*"
+pytest = "*"
 
 [dev-packages]
 

@@ -187,7 +187,7 @@ class CA_space:
 		print(pretty_space)
 
 
-CA = CA_space(300,200,50)
+#CA = CA_space(300,200,50)
 #CA.import_txt("import.txt")
-CA.fill_space("export")
-CA.export_txt("export")
+#CA.fill_space("export")
+#CA.export_txt("export")
