@@ -11,7 +11,11 @@
 ################################################################################
 
 colour
+flask
+flask-expects-json
 imageio
 numpy
 pillow
 ptable
+pytest
+requests
