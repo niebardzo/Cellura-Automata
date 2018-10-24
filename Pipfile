@@ -7,6 +7,8 @@ name = "pypi"
 numpy = "*"
 ptable = "*"
 pillow = "*"
+imageio = "*"
+colour = "*"
 
 [dev-packages]
 

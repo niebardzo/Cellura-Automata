@@ -6,6 +6,8 @@ import math
 import numpy as np
 from prettytable import PrettyTable
 from PIL import Image
+import imageio
+from colour import Color
 
 class Cell:
 
@@ -106,7 +108,24 @@ class CA_space:
 		while self.empty_cells >= 0:
 			self.build_grains()
 			self.pretty_display()
+
 			
+
+	def export_image(self):
+		pass
+
+	def export_txt(self):
+		pass
+
+	def export_gif(self):
+		pass
+
+	def import_image(self):
+		pass
+
+	def import_txt(self):
+		pass
+
 
 	def pretty_display(self):
 		"""Display the space with PrettyTables."""
