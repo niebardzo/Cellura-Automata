@@ -110,10 +110,11 @@ class CA_space:
 	def fill_space(self, name):
 		"""Will be filling space until all element are not empty."""
 		counter = 0
+		self.export_image(str(name)+str(counter))
 		while self.empty_cells >= 0:
-			self.export_image(str(name)+str(counter))
 			self.build_grains()
 			counter = counter + 1
+			self.export_image(str(name)+str(counter))
 			#self.pretty_display()
 		self.export_image(name)
 		self.export_txt(name)
@@ -155,7 +156,9 @@ class CA_space:
 
 	def export_gif(self,name,counter):
 		images = []
-		for i in range(1,counter):
+		if counter == 0:
+			counter = 1
+		for i in range(0,counter):
 			images.append(imageio.imread('./static/temp/'+str(name)+str(i)+'.png'))
 		if images == []:
 			return 0

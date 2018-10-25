@@ -3,10 +3,10 @@
     <div class="container">
     	   <div class="row" style="padding: 50px">
     		<div class="col-sm-3">
-    		<button class="btn btn-primary btn-lg text-white"><a class="text-white" href="{{ url_for('static', filename = 'temp/'+name+'.png') }}" download="">Export png</a></button>
+    		<a class="btn btn-primary btn-lg text-white" href="{{ url_for('static', filename = 'temp/'+name+'.png') }}" download="">Export png</a>
     		</div>
     		 <div class="col-sm-3">
-    		<button class="btn btn-primary btn-lg text-white"><a class="text-white" href="{{ url_for('static', filename = 'temp/'+name+'.txt') }}" download="">Export txt</a></button>
+    		<a class="btn btn-primary btn-lg text-white" href="{{ url_for('static', filename = 'temp/'+name+'.txt') }}" download="">Export txt</a>
     	</div>
     	</div>
         <div class="row">
