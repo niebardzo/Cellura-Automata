@@ -1,0 +1,28 @@
+{% extends "template.html" %}
+{% block body %}
+<div class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="intro-message">
+                    <form action="/import" method="post">
+                        <div class="form-group row">
+                            <label for="file" class="col-sm-2 col-form-label">Import file:</label>
+                            <div class="col-sm-4">
+                                <div class="btn btn-secondary"> Browse:
+                                <input type="file" id="file" name="file"required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

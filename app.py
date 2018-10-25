@@ -111,8 +111,8 @@ class CA_space:
 		"""Will be filling space until all element are not empty."""
 		counter = 0
 		while self.empty_cells >= 0:
-			self.build_grains()
 			self.export_image(str(name)+str(counter))
+			self.build_grains()
 			counter = counter + 1
 			#self.pretty_display()
 		self.export_image(name)
@@ -121,7 +121,7 @@ class CA_space:
 
 			
 	def export_txt(self, name):
-		with open(str(name)+'.txt','w') as file:
+		with open('./static/temp/'+str(name)+'.txt','w') as file:
 			file.write(str(self.space.shape[1])+ ' ' + str(self.space.shape[0])+' '+str(self.grains - 1) + '\n')
 			for cell in self.space.flat:
 				x, y = cell.find_id()
@@ -149,22 +149,23 @@ class CA_space:
 					x,y = cell.find_id()
 					image[x,y] = rgb
 		img = Image.fromarray(image.astype('uint8'))
-		img.save(str(name)+'.png')
+		img = img.resize((self.space.shape[1]*3,self.space.shape[0]*3))
+		img.save('./static/temp/'+str(name)+'.png')
 
 
 	def export_gif(self,name,counter):
 		images = []
 		for i in range(1,counter):
-			images.append(imageio.imread(str(name)+str(i)+'.png'))
+			images.append(imageio.imread('./static/temp/'+str(name)+str(i)+'.png'))
 		if images == []:
 			return 0
-		imageio.mimsave(str(name)+'.gif', images)
+		imageio.mimsave('./static/temp/'+str(name)+'.gif', images)
 		for i in range(counter):
-			os.remove(str(name)+str(i)+'.png')
+			os.remove('./static/temp/'+str(name)+str(i)+'.png')
 
 
-	def import_txt(self, path):
-		with open(str(path), 'r') as file:
+	def import_txt(self, name):
+		with open('./static/temp/'+str(name), 'r') as file:
 			lines = file.readlines()
 			init = lines[0].split(' ')
 			self.__init__(int(init[1]),int(init[0]),int(init[2]))
@@ -190,6 +191,6 @@ class CA_space:
 		print(pretty_space)
 
 
-#CA = CA_space(300,200,50)
+#CA = CA_space(200,200,50)
 #CA.import_txt("import.txt")
 #CA.fill_space("export")

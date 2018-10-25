@@ -1,0 +1,38 @@
+{% extends "template.html" %}
+{% block body %}
+<div class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="intro-message">
+                    <form action="/" method="post">
+                        <div class="form-group row">
+                            <label for="x" class="col-sm-2 col-form-label">First Dim:</label>
+                            <div class="col-sm-4">
+                                <input type="number" min="2" max="300" class="form-control" id="x" name="x" placeholder="X" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="y" class="col-sm-2 col-form-label">Second Dim:</label>
+                            <div class="col-sm-4">
+                                <input type="number" min="2" max="300" class="form-control" id="y" name="y" placeholder="Y" required>
+                             </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="n" class="col-sm-2 col-form-label">Num of grains:</label>
+                            <div class="col-sm-4">
+                                <input type="number" min="2" max="300" class="form-control" id="n" name="n" placeholder="N" required>
+                             </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
