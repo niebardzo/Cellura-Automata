@@ -73,6 +73,7 @@ class CA_space:
 
 
 	def check_empty_neighbours(self, cell):
+		"""To check if cell has only neighbours with the state 0."""
 		neighbours = self.get_neighbours(cell)
 		flag = True
 		for neighbour in neighbours:
@@ -82,6 +83,7 @@ class CA_space:
 
 
 	def build_grains(self):
+		"""Basic function to grow the grains."""
 		time = datetime.datetime.now()
 		for cell in self.space.flat:
 			if cell.state != 0 :
@@ -108,17 +110,19 @@ class CA_space:
 	def fill_space(self, name):
 		"""Will be filling space until all element are not empty."""
 		counter = 0
+		self.export_image(str(name)+str(counter))
 		while self.empty_cells >= 0:
 			self.build_grains()
-			self.export_image(str(name)+str(counter))
 			counter = counter + 1
+			self.export_image(str(name)+str(counter))
 			#self.pretty_display()
 		self.export_image(name)
+		self.export_txt(name)
 		self.export_gif(name,counter)
 
 			
 	def export_txt(self, name):
-		with open(str(name)+'.txt','w') as file:
+		with open('./static/temp/'+str(name)+'.txt','w') as file:
 			file.write(str(self.space.shape[1])+ ' ' + str(self.space.shape[0])+' '+str(self.grains - 1) + '\n')
 			for cell in self.space.flat:
 				x, y = cell.find_id()
@@ -146,22 +150,25 @@ class CA_space:
 					x,y = cell.find_id()
 					image[x,y] = rgb
 		img = Image.fromarray(image.astype('uint8'))
-		img.save(str(name)+'.png')
+		img = img.resize((self.space.shape[1]*3,self.space.shape[0]*3))
+		img.save('./static/temp/'+str(name)+'.png')
 
 
 	def export_gif(self,name,counter):
 		images = []
-		for i in range(1,counter):
-			images.append(imageio.imread(str(name)+str(i)+'.png'))
+		if counter == 0:
+			counter = 1
+		for i in range(0,counter):
+			images.append(imageio.imread('./static/temp/'+str(name)+str(i)+'.png'))
 		if images == []:
 			return 0
-		imageio.mimsave(str(name)+'.gif', images)
+		imageio.mimsave('./static/temp/'+str(name)+'.gif', images)
 		for i in range(counter):
-			os.remove(str(name)+str(i)+'.png')
+			os.remove('./static/temp/'+str(name)+str(i)+'.png')
 
 
-	def import_txt(self, path):
-		with open(str(path), 'r') as file:
+	def import_txt(self, name):
+		with open('./static/temp/'+str(name), 'r') as file:
 			lines = file.readlines()
 			init = lines[0].split(' ')
 			self.__init__(int(init[1]),int(init[0]),int(init[2]))
@@ -172,7 +179,7 @@ class CA_space:
 
 
 	def pretty_display(self):
-		"""Display the space with PrettyTables."""
+		"""Display the space with PrettyTables. Used for testing purpose before export was avaiable."""
 		pretty_space = PrettyTable()
 		pretty_space.field_names = range(self.space.shape[1])
 		count = 0
@@ -187,7 +194,6 @@ class CA_space:
 		print(pretty_space)
 
 
-CA = CA_space(300,200,50)
-CA.import_txt("import.txt")
-CA.fill_space("export")
-CA.export_txt("export")
+#CA = CA_space(200,200,50)
+#CA.import_txt("import.txt")
+#CA.fill_space("export")
