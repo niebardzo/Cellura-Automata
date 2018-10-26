@@ -49,6 +49,27 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def check_file_validity(filename):
+	with open('./static/temp/'+str(filename), 'r') as file:
+		lines = file.readlines()
+		init = lines[0].split(' ')
+		try:
+			if len(lines[1:]) != (int(init[0])*int(init[1])):
+				return False
+			if 2 > int(init[2]) or int(init[2]) > max(int(init[0]),int(init[1])) or (int(init[0])*int(init[1])) < 4:
+				return False
+			for line in lines[1:]:
+				line = line.split(' ')
+				if line[3] == line[0] + ':' + line[1]:
+					return False
+				if int(line[2]) not in range(int(init[2])+1):
+					return False
+			return True
+		except ValueError:
+			return False
+				
+
+
 @app.route("/", methods=('GET', 'POST'))
 def main_page():
 	delete_temp()
@@ -88,13 +109,16 @@ def import_page():
 			filename = secure_filename(file.filename)
 			file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 			file.save(file_path)
-			CA = CA_space(2,2,2)
-			CA.import_txt(filename)
-			time = str(datetime.datetime.now()).encode('utf-8')
-			name = hashlib.sha256(time).hexdigest()
-			name = str(name)
-			CA.fill_space(name)
-			return redirect(url_for('final_page', name=name))
+			if check_file_validity(filename):
+				CA = CA_space(2,2,2)
+				CA.import_txt(filename)
+				time = str(datetime.datetime.now()).encode('utf-8')
+				name = hashlib.sha256(time).hexdigest()
+				name = str(name)
+				CA.fill_space(name)
+				return redirect(url_for('final_page', name=name))
+			else:
+				raise InvalidUsage('Wrong data supplied. File has been damaged.', status_code=400)
 
 	return render_template('import.html')
 
