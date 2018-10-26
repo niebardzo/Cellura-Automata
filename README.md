@@ -91,6 +91,7 @@ def get_neighbours(self, cell):
 
 
 
-## AGH Students
+## Contact
 
+If you would like to ask me a question, please contact me: pat049b@gmail.com.
 If you are AGH WIMiIP Applied Computer Science student and you found this repository useful in you project, please leave me a star.
