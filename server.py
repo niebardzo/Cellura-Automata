@@ -20,8 +20,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 if not os.path.exists("static"):
 	os.mkdir("static")
-	if not os.path.exists(UPLOAD_FOLDER):
-		os.mkdir(UPLOAD_FOLDER)
+if not os.path.exists(UPLOAD_FOLDER):
+	os.mkdir(UPLOAD_FOLDER)
 
 class InvalidUsage(Exception):
     status_code = 400
