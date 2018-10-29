@@ -58,7 +58,7 @@ First endpoint of the application takes 2 HTTP method: GET, POST.
 
 Import endpoint takes also 2 HTTP method: GET, POST.
 - GET returns a webpage with form to upload file.
-- POST is used to send form data (file) to the backend. As a response you will get redirect to final endpoint with the final image of grown grains and buttons to export png/txt
+- POST is used to send form data (file) to the backend, only files previously exported are valid to send to import. Supported formats: txt, png. As a response you will get redirect to final endpoint with the final image of grown grains and buttons to export png/txt
 
 **3. /final/<file_name>**
 This endpoint was design for displaying final results. It is REST Endpoint where you need to give the file name to display a file. If you haven't send any data to the backend before, you will get redirect to main page. 
