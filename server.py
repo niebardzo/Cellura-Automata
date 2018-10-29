@@ -7,6 +7,8 @@ import json
 import os
 import datetime
 import hashlib
+from shutil import copyfile
+import re
 
 
 UPLOAD_FOLDER = 'static/temp/'
@@ -50,6 +52,20 @@ def allowed_file(filename):
 
 
 def check_file_validity(filename):
+	with open('./static/temp/'+str(filename), 'rb') as file:
+		lines = file.readlines()
+		if 'PNG'.encode('utf-8') in lines[0]:
+			with open('./static/temp/temp.txt', 'w') as text:
+				for line in lines[3:]:
+					try:
+						decoded = line.decode('utf-8')
+						match = re.search(r'\d\d?\d? \d\d?\d? \d\d?\d?( \d\d?\d?:\d\d?\d?)?\n?',decoded)
+						if match:
+							text.write(match.group())
+					except UnicodeDecodeError:
+						continue
+			os.remove('./static/temp/'+str(filename))
+			os.rename('./static/temp/temp.txt','./static/temp/'+str(filename))
 	with open('./static/temp/'+str(filename), 'r') as file:
 		lines = file.readlines()
 		init = lines[0].split(' ')

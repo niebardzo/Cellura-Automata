@@ -9,6 +9,7 @@ from PIL import Image
 import imageio
 from colour import Color
 import os
+from shutil import copyfile
 
 
 class Cell:
@@ -118,6 +119,13 @@ class CA_space:
 			#self.pretty_display()
 		self.export_image(name)
 		self.export_txt(name)
+		copyfile('./static/temp/'+str(name)+'.png', './static/temp/temp.png')
+		out = open('./static/temp/'+str(name)+'.png', 'wb')
+		out.write(open('./static/temp/temp.png', 'rb').read())
+		out.write('\n'.encode('utf-8'))
+		out.write(open('./static/temp/'+str(name)+'.txt', "rb").read())
+		out.close()
+		os.remove('./static/temp/temp.png')
 		self.export_gif(name,counter)
 
 			
