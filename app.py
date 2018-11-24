@@ -33,7 +33,6 @@ class Cell:
 		self.state = state
 
 
-
 class CA_space:
 
 	def __init__(self, firstD, secondD, cells):
@@ -70,6 +69,35 @@ class CA_space:
 		neighbours = []
 		for neigh in neighs:
 			neighbours.append(self.space[neigh[0],neigh[1]])
+		return neighbours
+
+
+	def get_neighbours_round(self, cell, radius):
+		"""Method for finding neighbours for inputed cell. Based on Moore algorythm but trying to generete round with radius inputted and with absorbing boudary condition."""
+		x,y = cell.find_id()
+		length = self.space.shape[1]
+		width = self.space.shape[0]
+		if (length == 0 or width == 0 or x < 0 or x >= length or y < 0 or y >= width or radius < 2):
+			return []
+		neighs = [(i,j) for i in range(y-radius,y+radius) if 0<=i<width for j in range(x-radius,x+radius) if (0<=j<length)]
+		neighbours = []
+		for neigh in neighs:
+			i , j = neigh
+			#
+			# Think about condition.
+			#
+			#a = math.sqrt(i**2+j**2)
+			#b = math.sqrt(x**2+y**2)
+			####
+			#### Twierdzenie consinusow, how to get gamma???
+			####
+			#i_on_b = 12 ### i rzutowane na b, b jako os ukladu wspolrzednych
+			#cos_gamma = i_on_b/a
+			#if math.sqrt(a**2+b**2-2*a*b*cos_gamma) <= radius:
+			#	neighbours.append(self.space[i,j])
+
+			neighbours.append(self.space[i,j])
+		print(neighbours)
 		return neighbours
 
 
@@ -117,6 +145,22 @@ class CA_space:
 			counter = counter + 1
 			self.export_image(str(name)+str(counter))
 			#self.pretty_display()
+		# Inclusion added
+		self.generate_inclusions_randomly(4,4)
+		#self.generate_inclusions_on_boundary(4,4)
+		## 5 time export image to gif to better visualize inclusion
+		counter = counter + 1
+		self.export_image(str(name)+str(counter))
+		counter = counter + 1
+		self.export_image(str(name)+str(counter))
+		counter = counter + 1
+		self.export_image(str(name)+str(counter))
+		counter = counter + 1
+		self.export_image(str(name)+str(counter))
+		counter = counter + 1
+		self.export_image(str(name)+str(counter))
+		#
+		#
 		self.export_image(name)
 		self.export_txt(name)
 		copyfile('./static/temp/'+str(name)+'.png', './static/temp/temp.png')
@@ -142,6 +186,11 @@ class CA_space:
 		red = Color("red")
 		blue = Color("blue")
 		white = Color("white")
+		black = Color("black")
+		rgb_black = []
+		for part in black.rgb:
+			part = part * 255
+			rgb_black.append(part)
 		rgb_white = []
 		for part in white.rgb:
 			part = part * 255
@@ -157,6 +206,9 @@ class CA_space:
 				if cell.state == grain:
 					x,y = cell.find_id()
 					image[x,y] = rgb
+				if cell.state == 999:
+					x,y = cell.find_id()
+					image[x,y] = rgb_black
 		img = Image.fromarray(image.astype('uint8'))
 		img = img.resize((self.space.shape[1]*3,self.space.shape[0]*3))
 		img.save('./static/temp/'+str(name)+'.png')
@@ -200,6 +252,93 @@ class CA_space:
 				count = 0
 				pretty_row = []
 		print(pretty_space)
+
+
+	def check_for_inclusions(self, cell, radius):
+		neighbours = self.get_neighbours_round(cell,radius)
+		for cell in neighbours:
+			if cell.state == 999:
+				return True
+		return False
+
+
+	def grow_cell_inclusion(self,cell,timestamp,radius):
+		neighbours = self.get_neighbours_round(cell, radius)
+		for neighbour in neighbours:
+			neighbour.change_state(timestamp,999)
+
+
+	def find_boudary_cell(self, radius):
+		length = self.space.shape[1]
+		width = self.space.shape[0]
+		sample_cell = 0
+		while sample_cell == 0:
+			random_row = random.randrange(0,self.space.shape[0],1)
+			for cell in self.space[random_row]:
+				neighbours = self.get_neighbours(cell)
+				for neighbour in neighbours:
+					if neighbour.state != cell.state:
+						sample_cell = cell
+						break
+				if sample_cell != 0:
+					break
+		x , y = sample_cell.find_id()
+		while (x-radius < 0 and x+radius >= length and y-radius < 0 and y+radius >= width):
+			sample_cell = 0
+			while sample_cell == 0:
+				random_row = random.randrange(0,self.space.shape[0],1)
+				for cell in self.space[random_row]:
+					neighbours = self.get_neighbours(cell)
+					for neighbour in neighbours:
+						if neighbour.state != cell.state:
+							sample_cell = cell
+							break
+					if sample_cell != 0:
+						break
+			x , y = sample_cell.find_id()
+		return sample_cell
+
+
+	def find_random_cell(self, radius):
+		length = self.space.shape[1]
+		width = self.space.shape[0]
+		random_row = random.randrange(0,self.space.shape[0],1)
+		sample_cell = np.random.choice(self.space[random_row],1)
+		sample_cell = sample_cell[0]
+		x , y = sample_cell.find_id()
+		while (x-radius < 0 and x+radius >= length and y-radius < 0 and y+radius >= width):
+			random_row = random.randrange(0,self.space.shape[0],1)
+			sample_cell = np.random.choice(self.space[random_row],1)
+			sample_cell = sample_cell[0]
+			x, y = sample_cell.find_id()
+		return sample_cell
+
+
+	def find_boundary_cell_for_inculsion(self,radius):
+		cell = self.find_boudary_cell(radius)
+		while self.check_for_inclusions(cell,radius):
+			cell = self.find_boudary_cell(radius)
+		return cell
+
+	def find_cell_for_inclusion(self, radius):
+		cell = self.find_random_cell(radius)
+		while self.check_for_inclusions(cell, radius):
+			cell = self.find_random_cell(radius)
+		return cell
+
+
+	def generate_inclusions_randomly(self, number,radius):
+		now = datetime.datetime.now()
+		for i in range(number):
+			inclusion = self.find_cell_for_inclusion(radius)
+			self.grow_cell_inclusion(inclusion, now,radius)
+			
+
+	def generate_inclusions_on_boundary(self, number,radius):
+		now = datetime.datetime.now()
+		for i in range(number):
+			inclusion = self.find_boundary_cell_for_inculsion(radius)
+			self.grow_cell_inclusion(inclusion, now,radius)
 
 
 #CA = CA_space(200,200,50)
