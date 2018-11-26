@@ -98,18 +98,33 @@ def main_page():
 			x = int(request.form.get('x'))
 			y = int(request.form.get('y'))
 			n = int(request.form.get('n'))
+			inc_n = int(request.form.get('n_inc'))
+			inc_r_start = int(request.form.get('inc_r_start'))
+			inc_r_stop = int(request.form.get('inc_r_stop'))
+			inc_p = str(request.form.get('inc_p'))
 
 		except TypeError:
-			raise InvalidUsage('Wrong data supplied. Please send data via webform.', status_code=400)
+			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
 		
-		if x not in range(2,301) and y not in range(2,301) and n not in range(2,301) and n >= max(x,y):
-			raise InvalidUsage('Wrong data supplied.  Please send data via webform.', status_code=400)
+		if x not in range(2,301) or y not in range(2,301) or n not in range(2,301) or n > max(x,y):
+			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
 		
+		if inc_n not in range(0,51) or inc_p not in ['Random', 'Random on boudaries'] or inc_r_start not in range(2,11) or inc_r_stop not in range(2,11) or inc_r_start > inc_r_stop:
+			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
+
 		CA = CA_space(x,y,n)
 		time = str(datetime.datetime.now()).encode('utf-8')
 		name = hashlib.sha256(time).hexdigest()
 		name = str(name)
-		CA.fill_space(name)
+
+		if inc_p == 'Random':
+			inc_p = True
+		else:
+			inc_p = False
+
+		inclusions = [inc_n, inc_p, [inc_r_start, inc_r_stop]]
+
+		CA.fill_space(name, inclusions)
 
 		return redirect(url_for('final_page', name=name))
 

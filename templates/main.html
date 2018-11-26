@@ -1,5 +1,6 @@
 {% extends "template.html" %}
 {% block body %}
+
 <div class="intro-header">
     <div class="container">
         <div class="row">
@@ -21,7 +22,34 @@
                         <div class="form-group row">
                             <label for="n" class="col-sm-2 col-form-label">Num of grains:</label>
                             <div class="col-sm-4">
-                                <input type="number" min="2" max="300" class="form-control" id="n" name="n" placeholder="N" required>
+                                <input type="number" min="2" max="300" class="form-control" id="n" name="n" placeholder="Grains" required>
+                             </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="n_inc" class="col-sm-2 col-form-label">Num of inclusions:</label>
+                            <div class="col-sm-4">
+                                <input type="number" min="0" max="50" class="form-control" id="n_inc" name="n_inc" placeholder="Inclusions" required>
+                             </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inc_p" class="col-sm-2 col-form-label">Position:</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" id="inc_p" name="inc_p" required>
+                                <option>Random</option>
+                                <option>Random on boudaries</option>
+                                </select>
+                             </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inc_r_start" class="col-sm-2 col-form-label">Radius start:</label>
+                            <div class="col-sm-4">
+                                <input type="number" min="2" max="10" class="form-control" id="inc_r_start" name="inc_r_start" placeholder="Start" required>
+                             </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inc_r_stop" class="col-sm-2 col-form-label">Radius stop:</label>
+                            <div class="col-sm-4">
+                                <input type="number" min="2" max="10" class="form-control" id="inc_r_stop" name="inc_r_stop" placeholder="Stop" required>
                              </div>
                         </div>
                         <div class="form-group row">
