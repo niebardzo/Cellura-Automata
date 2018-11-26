@@ -83,7 +83,8 @@ def check_file_validity(filename):
 				if line[3] == line[0] + ':' + line[1]:
 					return False
 				if int(line[2]) not in range(int(init[2])+1):
-					return False
+					if int(line[2]) != 999:
+						return False
 			return True
 		except ValueError:
 			return False
@@ -110,6 +111,9 @@ def main_page():
 			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
 		
 		if inc_n not in range(0,51) or inc_p not in ['Random', 'Random on boudaries'] or inc_r_start not in range(2,11) or inc_r_stop not in range(2,11) or inc_r_start > inc_r_stop:
+			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
+
+		if inc_r_start > inc_r_stop:
 			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
 
 		CA = CA_space(x,y,n)
@@ -150,7 +154,7 @@ def import_page():
 				time = str(datetime.datetime.now()).encode('utf-8')
 				name = hashlib.sha256(time).hexdigest()
 				name = str(name)
-				CA.fill_space(name)
+				CA.fill_space(name,[0,0,0])
 				return redirect(url_for('final_page', name=name))
 			else:
 				raise InvalidUsage('Wrong data supplied. File has been damaged.', status_code=400)

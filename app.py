@@ -84,7 +84,7 @@ class CA_space:
 		neighbours = []
 		for neigh in neighs:
 			i , j = neigh
-			if round(math.sqrt((j-x)**2+(i-y)**2),4) <= round(radius + math.sqrt(1),4):
+			if round(math.sqrt((j-x)**2+(i-y)**2),4) < round(radius,4):
 				neighbours.append(self.space[neigh[0],neigh[1]])
 		return neighbours
 
