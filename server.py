@@ -99,7 +99,9 @@ def main_page():
 			x = int(request.form.get('x'))
 			y = int(request.form.get('y'))
 			n = int(request.form.get('n'))
+			prob = int(request.form.get('prob'))
 			inc_n = int(request.form.get('n_inc'))
+			inc_type = str(request.form.get('inc_type'))
 			inc_r_start = int(request.form.get('inc_r_start'))
 			inc_r_stop = int(request.form.get('inc_r_stop'))
 			inc_p = str(request.form.get('inc_p'))
@@ -115,18 +117,26 @@ def main_page():
 
 		if inc_r_start > inc_r_stop:
 			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
+		if prob > 100 or prob < 1:
+			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
 
 		CA = CA_space(x,y,n)
 		time = str(datetime.datetime.now()).encode('utf-8')
 		name = hashlib.sha256(time).hexdigest()
 		name = str(name)
 
+
 		if inc_p == 'Random':
 			inc_p = True
 		else:
 			inc_p = False
 
-		inclusions = [inc_n, inc_p, [inc_r_start, inc_r_stop]]
+		if inc_type == 'Round':
+			inc_type = True
+		else:
+			inc_type = False
+
+		inclusions = [inc_type ,inc_n, inc_p, [inc_r_start, inc_r_stop]]
 
 		CA.fill_space(name, inclusions)
 
@@ -162,10 +172,43 @@ def import_page():
 	return render_template('import.html')
 
 
-@app.route("/final/<name>")
+@app.route("/final/<name>", methods=('GET', 'POST'))
 def final_page(name):
 	if len(os.listdir('static/temp') ) == 0:
 		return redirect(url_for('main_page'))
+	if request.method == 'POST':
+		try:
+			inc_n = int(request.form.get('n_inc'))
+			inc_type = str(request.form.get('inc_type'))
+			inc_r_start = int(request.form.get('inc_r_start'))
+			inc_r_stop = int(request.form.get('inc_r_stop'))
+			inc_p = str(request.form.get('inc_p'))
+		except TypeError:
+			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
+
+
+		CA = CA_space(2,2,2)
+		CA.import_txt(name+ '.txt')
+		time = str(datetime.datetime.now()).encode('utf-8')
+		fname = hashlib.sha256(time).hexdigest()
+		fname = str(fname)
+
+		if inc_p == 'Random':
+			inc_p = True
+		else:
+			inc_p = False
+
+		if inc_type == 'Round':
+			inc_type = True
+		else:
+			inc_type = False
+
+		inclusions = [inc_type ,inc_n, inc_p, [inc_r_start, inc_r_stop]]
+
+		CA.fill_space(fname, inclusions)
+
+		return redirect(url_for('final_page', name=fname))
+
 	return render_template('final.html', name=name)
 
 
