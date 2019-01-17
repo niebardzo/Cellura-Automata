@@ -117,10 +117,10 @@ def main_page():
 
 		if inc_r_start > inc_r_stop:
 			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
-		if prob > 100 or prob < 1:
+		if prob > 100 or prob < 0:
 			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
 
-		CA = CA_space(x,y,n)
+		CA = CA_space(x,y,n,prob)
 		time = str(datetime.datetime.now()).encode('utf-8')
 		name = hashlib.sha256(time).hexdigest()
 		name = str(name)
@@ -164,7 +164,7 @@ def import_page():
 				time = str(datetime.datetime.now()).encode('utf-8')
 				name = hashlib.sha256(time).hexdigest()
 				name = str(name)
-				CA.fill_space(name,[0,0,0])
+				CA.fill_space(name,[0,0,0,0])
 				return redirect(url_for('final_page', name=name))
 			else:
 				raise InvalidUsage('Wrong data supplied. File has been damaged.', status_code=400)

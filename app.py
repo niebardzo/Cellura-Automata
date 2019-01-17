@@ -35,13 +35,14 @@ class Cell:
 
 class CA_space:
 
-	def __init__(self, firstD, secondD, cells):
+	def __init__(self, firstD, secondD, cells, prob=0):
 		"""Constructor for CA space. As input you need to give First D size, Second D size and the number of seed grains."""
 		self.init_time = datetime.datetime.now()
 		self.space = np.array([[Cell(str(i)+ ':' + str(j), self.init_time, 0) for i in range(secondD)] for j in range(firstD)])		
 		self.grains = cells + 1
 		self.generate_grains(self.grains)
 		self.empty_cells = (firstD * secondD) - self.grains
+		self.probability =  prob
 
 
 	def generate_grains(self, cells):
@@ -71,6 +72,28 @@ class CA_space:
 			neighbours.append(self.space[neigh[0],neigh[1]])
 		return neighbours
 
+	def get_nearest_neighbours(self, cell):
+		"""Method for finding nearest neighbours for inputed cell. Using Moore algorythm and with absorbing boudary condition."""
+		neighs = self.get_neighbours(cell)
+		i, j = cell.find_id()
+		neighbours = []
+		for neigh in neighs:
+			x, y = neigh.find_id()
+			if abs(x-i)+abs(y-j) <= 1: 
+				neighbours.append(self.space[y,x])
+		return neighbours
+
+	def get_further_neighbours(self, cell):
+		"""Method for finding further neighbours for inputed cell. Using Moore algorythm and with absorbing boudary condition."""
+		neighs = self.get_neighbours(cell)
+		i, j = cell.find_id()
+		neighbours = []
+		for neigh in neighs:
+			x, y = neigh.find_id()
+			if abs(x-i)+abs(y-j) > 1 or abs(x-i)+abs(y-j) == 0: 
+				neighbours.append(self.space[y,x])
+		return neighbours
+
 
 	def get_neighbours_square(self, cell, dist):
 		"""Method for finding neighbours for inputed cell. Using Moore algorythm and with absorbing boudary condition."""
@@ -89,7 +112,6 @@ class CA_space:
 	def get_neighbours_round(self, cell, radius):
 		"""Method for finding neighbours for inputed cell. Based on Moore algorythm but trying to generete round with radius inputted and with absorbing boudary condition."""
 		x,y = cell.find_id()
-		
 		length = self.space.shape[1]
 		width = self.space.shape[0]
 		if (length == 0 or width == 0 or x < 0 or x >= length or y < 0 or y >= width or radius < 2):
@@ -112,30 +134,78 @@ class CA_space:
 				flag = False
 		return flag
 
+	def decide_changing(self, cell, neighbours, limit, time):
+		grains = [0 for i in range(self.grains)]
+		for i in range(1,self.grains+1):
+			for neighbour in neighbours:
+				if neighbour.state == i and neighbour.timestamp < time:
+					grains[i] = grains[i] + 1
+		if grains == [0 for i in range(self.grains)]:
+			return True
+		for i in range(self.grains):
+			if grains[i] >= limit:
+				cell.change_state(time, i)
+				self.empty_cells = self.empty_cells - 1
+				return False
+		return True
+
 
 	def build_grains(self):
 		"""Basic function to grow the grains."""
 		time = datetime.datetime.now()
-		for cell in self.space.flat:
-			if cell.state != 0 :
-				continue
-			elif self.check_empty_neighbours(cell):
-				continue
-			else:
-				neighbours = self.get_neighbours(cell)
-				grains = [0 for i in range(self.grains)]
-				for i in range(1,self.grains+1):
-					for neighbour in neighbours:
-						if neighbour.state == i and neighbour.timestamp < time:
-							grains[i] = grains[i] + 1
-				if grains == [0 for i in range(self.grains)]:
+		if self.probability == 0:
+			for cell in self.space.flat:
+				if cell.state != 0 :
 					continue
-				new_grain = 0
-				for i in range(self.grains):
-					if grains[i] >= new_grain:
-						new_grain = i
-				cell.change_state(time, new_grain)
-				self.empty_cells = self.empty_cells - 1
+				elif self.check_empty_neighbours(cell):
+					continue
+				else:	
+					neighbours = self.get_neighbours(cell)
+					grains = [0 for i in range(self.grains)]
+					for i in range(1,self.grains+1):
+						for neighbour in neighbours:
+							if neighbour.state == i and neighbour.timestamp < time:
+								grains[i] = grains[i] + 1
+					if grains == [0 for i in range(self.grains)]:
+						continue
+					new_grain = 0
+					for i in range(self.grains):
+						if grains[i] >= new_grain:
+							new_grain = i
+					cell.change_state(time, new_grain)
+					self.empty_cells = self.empty_cells - 1
+		else:
+			for cell in self.space.flat:
+				if cell.state != 0 :
+					continue
+				elif self.check_empty_neighbours(cell):
+					continue
+				else:
+					neighbours = self.get_neighbours(cell)
+					if self.decide_changing(cell,neighbours,5, time):
+						neighbours = self.get_nearest_neighbours(cell)
+						if self.decide_changing(cell,neighbours,3, time):
+							neighbours = self.get_further_neighbours(cell)
+							if self.decide_changing(cell,neighbours,3, time):
+								neighbours = self.get_neighbours(cell)
+								grains = [0 for i in range(self.grains)]
+								for i in range(1,self.grains+1):
+									for neighbour in neighbours:
+										if neighbour.state == i and neighbour.timestamp < time:
+											grains[i] = grains[i] + 1
+								if grains == [0 for i in range(self.grains)]:
+									continue
+								new_grain = 0
+								for i in range(self.grains):
+									if grains[i] >= new_grain:
+										new_grain = i
+								random_number = random.random() * 100
+								if random_number <= self.probability:
+									cell.change_state(time, new_grain)
+									self.empty_cells = self.empty_cells - 1
+								else:
+									continue
+
 
 
 	def fill_space(self, name, inclusions):
@@ -153,6 +223,7 @@ class CA_space:
 		self.export_image(str(name)+str(counter))
 		while self.empty_cells >= 0:
 			self.build_grains()
+			print(counter)
 			counter = counter + 1
 			self.export_image(str(name)+str(counter))
 			#self.pretty_display()
@@ -353,6 +424,12 @@ class CA_space:
 			self.grow_cell_inclusion(inclusion, now,rad, inc_type)
 
 
-#CA = CA_space(200,200,50)
+#CA = CA_space(100,100,30)
+#neighs =  CA.get_further_neighbours(CA.space[0,0])
+#for neigh in neighs:
+#	print(neigh.find_id())
+
+#CA.fill_space(name, inclusions)
 #CA.import_txt("import.txt")
 #CA.fill_space("export")
+
