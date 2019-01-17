@@ -90,7 +90,16 @@ def get_neighbours(self, cell):
 
 ![Image of Moore neighbourhood](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Moore_neighborhood_with_cardinal_directions.svg/300px-Moore_neighborhood_with_cardinal_directions.svg.png)
 
+### Diff between 1.0 and 3.0 grain growth:
 
+**Release 1.0 - Grain Growth**
+
+![Release 1.0](https://raw.githubusercontent.com/pat049b/Cellura-Automata/master/images/lab1.gif)
+
+
+**Release 3.0 - Grain Growth**
+
+![Release 3.0](https://raw.githubusercontent.com/pat049b/Cellura-Automata/master/images/lab3.gif)
 
 ## Contact
 
