@@ -33,6 +33,7 @@ class Cell:
 		self.state = state
 
 
+
 class CA_space:
 
 	def __init__(self, firstD, secondD, cells, prob=0):
@@ -223,7 +224,8 @@ class CA_space:
 		self.export_image(str(name)+str(counter))
 		while self.empty_cells >= 0:
 			self.build_grains()
-			print(counter)
+
+			print(counter, self.empty_cells)
 			counter = counter + 1
 			self.export_image(str(name)+str(counter))
 			#self.pretty_display()
@@ -254,6 +256,11 @@ class CA_space:
 		blue = Color("blue")
 		white = Color("white")
 		black = Color("black")
+		gold = Color("gold")
+		rgb_gold = []
+		for part in gold.rgb:
+			part = part * 255
+			rgb_gold.append(part)
 		rgb_black = []
 		for part in black.rgb:
 			part = part * 255
@@ -276,6 +283,9 @@ class CA_space:
 				if cell.state == 999:
 					x,y = cell.find_id()
 					image[x,y] = rgb_black
+				if cell.state == 500:
+					x,y = cell.find_id()
+					image[x,y] = rgb_gold
 		img = Image.fromarray(image.astype('uint8'))
 		img = img.resize((self.space.shape[1]*3,self.space.shape[0]*3))
 		img.save('./static/temp/'+str(name)+'.png')
@@ -422,6 +432,42 @@ class CA_space:
 				rad = random.choice(range(start,stop+1))
 			inclusion = self.find_boundary_cell_for_inculsion(rad, inc_type)
 			self.grow_cell_inclusion(inclusion, now,rad, inc_type)
+
+
+	def find_all_grains(self, grain_num):
+		all_grains = []
+		for cell in self.space.flat:
+			if cell.state == grain_num:
+				all_grains.append(cell)
+		return all_grains
+
+
+	def dualphase(self, grain_num, name):
+		timestamp = datetime.datetime.now()
+		for i in range(grain_num):
+			grain = random.choice([j for j in range(self.grains)])
+			all_cells = self.find_all_grains(grain)
+			for cell in all_cells:
+				cell.change_state(timestamp, 500)
+		for cell in self.space.flat:
+			if cell.state != 500 and cell.state != 999:
+				cell.change_state(timestamp, 0)
+				self.empty_cells = self.empty_cells + 1
+		self.empty_cells = self.empty_cells - 20
+		self.grains = self.grains - grain_num
+		self.generate_grains(self.grains)
+		self.fill_space(name,[0,0,0,0])
+
+	def check_if_cell_on_boundary(self,cell):
+		neighbours = self.get_neighbours(cell)
+		for neighbour in neighbours:
+				if neighbour.state != cell.state and cell.state != 999:
+					return True
+		return False
+
+
+	def boundaries(self):
+		return 0
 
 
 #CA = CA_space(100,100,30)

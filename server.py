@@ -186,7 +186,6 @@ def final_page(name):
 		except TypeError:
 			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
 
-
 		CA = CA_space(2,2,2)
 		CA.import_txt(name+ '.txt')
 		time = str(datetime.datetime.now()).encode('utf-8')
@@ -211,6 +210,54 @@ def final_page(name):
 
 	return render_template('final.html', name=name)
 
+
+@app.route("/substractures/<name>", methods=('POST',))
+def substracture_endpoint(name):
+	if len(os.listdir('static/temp') ) == 0:
+		return redirect(url_for('main_page'))
+	if request.method == 'POST':
+		try:
+			grain_num = int(request.form.get('grain_n'))
+			grain_type = str(request.form.get('grain_type'))
+			
+		except TypeError:
+			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
+
+		CA = CA_space(2,2,2)
+		CA.import_txt(name+ '.txt')
+		time = str(datetime.datetime.now()).encode('utf-8')
+		fname = hashlib.sha256(time).hexdigest()
+		fname = str(fname)
+
+		CA.fill_space(fname,[0,0,0,0])
+		if grain_type == 'Substructure':
+			CA.substracture(grain_num, fname)
+		elif grain_type == 'Dual Phase':
+			CA.dualphase(grain_num, fname)
+		else:
+			raise InvalidUsage('Wrong data supplied. Please send valid data via webform.', status_code=400)
+
+		return redirect(url_for('final_page', name=fname))
+
+
+@app.route("/boundaries/<name>", methods=('GET',))
+def generate_boundaries(name):
+	if len(os.listdir('static/temp') ) == 0:
+		return redirect(url_for('main_page'))
+	if request.method == 'GET':
+
+		CA = CA_space(2,2,2)
+		CA.import_txt(name+ '.txt')
+		time = str(datetime.datetime.now()).encode('utf-8')
+		fname = hashlib.sha256(time).hexdigest()
+		fname = str(fname)
+
+		CA.boundaries()
+		CA.fill_space(fname, [0,0,0,0])
+
+		return redirect(url_for('final_page', name=fname))
+
+		return redirect(url_for('final_page', name=fname))
 
 @app.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
