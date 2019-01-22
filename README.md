@@ -101,6 +101,11 @@ def get_neighbours(self, cell):
 
 ![Release 3.0](https://raw.githubusercontent.com/pat049b/Cellura-Automata/master/images/lab3.gif)
 
+
+### Release 3.1 - Grain Growth (Dual Phase):
+
+![Release 3.5](https://raw.githubusercontent.com/pat049b/Cellura-Automata/master/images/lab4.gif)
+
 ## Contact
 
 If you would like to ask me a question, please contact me: pat049b@gmail.com.
