@@ -94,17 +94,17 @@ def get_neighbours(self, cell):
 
 ### Release 1.0 - Grain Growth:
 
-![Release 1.0](https://raw.githubusercontent.com/pat049b/Cellura-Automata/master/images/lab1.gif)
+![Release 1.0](../master/images/lab1.gif)
 
 
 ### Release 3.0 - Grain Growth:
 
-![Release 3.0](https://raw.githubusercontent.com/pat049b/Cellura-Automata/master/images/lab3.gif)
+![Release 3.0](../master/images/lab3.gif)
 
 
 ### Release 3.1 - Grain Growth (Dual Phase):
 
-![Release 3.5](https://raw.githubusercontent.com/pat049b/Cellura-Automata/master/images/lab4.gif)
+![Release 3.5](../master/images/lab4.gif)
 
 ## Contact
 
